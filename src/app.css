@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Favorit';
+  src: local('Favorit Regular'), local('Favorit-Regular'),
+    url('assets/Favorit-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Favorit', Helvetica, sans-serif;
+  @apply antialiased;
+}
+
+#app {
+  @apply w-screen h-screen overflow-hidden;
+}
+
+*:focus {
+  outline: none;
+}
+
+.crosshair {
+  cursor: crosshair;
+}
+.e-resize {
+  cursor: e-resize;
+}
+.ew-resize {
+  cursor: ew-resize;
+}
+.grab {
+  cursor: grab;
+}
+.grabbing {
+  cursor: grabbing;
+}
+.move {
+  cursor: move;
+}
+.pointer {
+  cursor: pointer;
+}
+.progress {
+  cursor: progress;
+}
+.wait {
+  cursor: wait;
+}

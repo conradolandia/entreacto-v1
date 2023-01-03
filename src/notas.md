@@ -1,0 +1,33 @@
+- en vista animal sebastian munera no, dice es cuarto animal, enlaza a video igual que logo, lo mismo corchetes. 
+- en vista animal iconos derecha, solo instagram arriba, solo compartir abajo. 
+- ampliar video para que sea aprox. 120% del ancho de la pantalla y tratar de desaparecer UI nativa del video. 
+- instagram.com/cuarto_animmal
+- orden de videos aleatorio, nunca parar
+- cuando acabe cancion seguir a otra al azar
+- cambiar videos tambien con teclado
+- sonido al abrir cuarto animal
+- arreglar tamaño de texto 
+- columna ancha, ver manual
+- esconder scrollbar
+- seccion contacto
+- desaparecer UI al permanecer inactivo 15 segundos sobre el video
+- boton de home volver a inicio total (entreacto)
+- en contacto no mover el corchete de la derecha con el cont
+- Añadir acciones a compartir y escribir
+- añadir UI a entrada animal
+- sobre fondo amarillo, hover de todos los enlaces iconos y texto, blancos
+- poner los logos
+- playlist musica en orden 
+- titulo del html cuarto animal
+- favicon o con orejitas
+- Texto en contacto: Somos una productora de cinematografía expandida. Investigamos, desarrollamos y producimos experiencias. Nuestro lugar de creación es el intermedio entre una idea y su puesta en escena.
+- eliminar foco del boton central al apretar teclas, pasda en chrome
+- eliminar la cancion duplicada
+- compartir copia url y genera aviso fondo negro legra amarilla
+- indicador de scroll blanco sobre fondo amarillo flecha de la fuente ver mapa de caracteres
+- añadir canciones faltantes
+- boton Cuarto de espera sobre el texto de intro -> abre videos
+- version compacta del logo cuarto animal 2 lineas
+- columna de logos vertical en movil
+
+- en el cuarto de espera mostrar una advertencia sobre usarlo en escritorio, si no se puede allow autoplay
