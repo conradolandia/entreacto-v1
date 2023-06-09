@@ -10,7 +10,7 @@
 
   let cerrarTodo = () => {
     let elementos = document.querySelectorAll('.visibleActo, .visibleEntre');
-    elementos.forEach((elemento) => {
+    elementos.forEach(elemento => {
       elemento.classList.remove('visibleActo', 'visibleEntre');
     });
   };
