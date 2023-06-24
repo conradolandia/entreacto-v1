@@ -138,7 +138,7 @@
 >
   <!-- ENTRE -->
   <div
-    class="entre bg-black text-white cortina 
+    class="entre bg-black text-white cortina
     {visibleEntre === true ? 'visibleEntre' : ''}"
   >
     <div class="ui w-full h-full">
@@ -205,7 +205,7 @@
   </div>
   <!-- ACTO -->
   <div
-    class="acto bg-black text-white cortina 
+    class="acto bg-black text-white cortina
     {visibleActo === true ? 'visibleActo' : ''} 
     {$abiertoActo === true ? 'z-[100] abiertoActo' : ''}"
   >
@@ -287,7 +287,7 @@
               <IntroText />
             {/if}
           {:else}
-            <button class="pointer-events-auto " on:click={abrirCuarto}>
+            <button class="pointer-events-auto" on:click={abrirCuarto}>
               <Animal className="fill-candela" />
             </button>
           {/if}
