@@ -1,18 +1,34 @@
 <script>
   import { idle } from 'svelte-idle';
+  import { onMount } from 'svelte';
+  import Router, { push } from 'svelte-spa-router';
+
+  const routes = {
+    '/proyecto/:slug': Proyecto,
+  };
 
   import { abiertoActo, playerOn } from './store';
 
   import Eleft from './Eleft.svelte';
   import Eright from './Eright.svelte';
   import Eboth from './Eboth.svelte';
-  import Animal from './LogoAnimal.svelte';
+
   import VideoPlayer from './VideoPlayer.svelte';
   import ButtonIcon from './ButtonIcon.svelte';
-  import IntroText from './IntroText.svelte';
+  import Proyecto from './Proyecto.svelte';
 
   let visibleEntre = false;
   let visibleActo = false;
+
+  let proyectos = [];
+
+  onMount(async () => {
+    const res = await fetch(
+      `http://entreacto.test/wp-json/wp/v2/posts?_fields=title,slug,id&per_page=99`
+    );
+    const json = await res.json();
+    proyectos = json.reverse();
+  });
 
   let elem;
   let elemScrollTop;
@@ -34,6 +50,7 @@
 
   let abrirCuarto = () => {
     $abiertoActo = true;
+    console.log(`abiertoActo es true`);
   };
 
   let cerrarCuarto = () => {
@@ -41,6 +58,7 @@
     $playerOn = false;
     visibleActo = false;
     $abiertoActo = false;
+    push('/');
   };
 
   let switchPlayer = () => {
@@ -96,7 +114,7 @@
   }
 
   // activar animal desde el principio
-  abrirCuarto();
+  //abrirCuarto();
 </script>
 
 <div class="logo-container">
@@ -260,38 +278,33 @@
               : '#000'}
           />
         </button>
+
+        <!-- menu proyectos -->
+
         <div
           bind:this={elem}
           on:scroll={() => (elemScrollTop = elem.scrollTop)}
           class="{$abiertoActo === true
             ? 'pointer-events-auto'
-            : 'pointer-events-none'} flex-grow z-50 px-4 -my-11 w-full h-full relative flex items-center justify-center contenidoActo overflow-y-auto"
+            : 'pointer-events-none'} flex-grow z-50 px-4 -my-11 w-full h-full relative flex flex-col items-center contenidoActo overflow-y-auto"
         >
-          {#if $abiertoActo === true}
-            <button
-              tabindex="-1"
-              class="{elemScrollTop
-                ? 'bg-candela py-[44px] w-full flex items-center justify-center'
-                : ''} pointer-events-auto sticky top-0"
-              on:click={switchPlayer}
-            >
-              <Animal
-                className="hover:fill-white {$playerOn === true
-                  ? 'fill-white'
-                  : 'fill-black'} {$idle === true
-                  ? 'opacity-0'
-                  : 'opacity-100'}"
-              />
-            </button>
-            {#if $playerOn === false}
-              <IntroText />
-            {/if}
+          {#if $abiertoActo !== true}
+            {#each proyectos as proyecto}
+              <button
+                class="pointer-events-auto min-h-full px-8"
+                on:click={() => push(`/proyecto/${proyecto.slug}`)}
+                on:click={abrirCuarto}
+              >
+                <h1 class="text-candela text-5xl">{proyecto.title.rendered}</h1>
+              </button>
+            {/each}
           {:else}
-            <button class="pointer-events-auto" on:click={abrirCuarto}>
-              <Animal className="fill-candela" />
-            </button>
+            <Router {routes} />
           {/if}
         </div>
+
+        <!-- fin menu proyectos -->
+
         <button
           on:click={switchPlayer}
           class={$abiertoActo === true ? 'bleft pointer-events-auto -mr-4' : ''}
@@ -431,7 +444,7 @@
     z-index: 100;
     width: 100vw;
     transform: translateX(-50%);
-    @apply bg-candela;
+    @apply bg-white;
     @apply text-black;
   }
 
