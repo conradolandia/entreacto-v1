@@ -20,7 +20,7 @@
   let num = 0;
 
   let randomVideoId = () => {
-    return ~~(Math.random() * $numVideos) + 1;
+    return Math.floor(Math.random() * $numVideos) + 1;
   };
 
   let currentVideoId = () => {
@@ -54,7 +54,7 @@
     return paud === 1 ? (paud = playlistLenght) : paud;
   };
 
-  let getSong = (id) => {
+  let getSong = id => {
     let songObject = audioData[id];
     if (!songObject) songObject = audioData[0];
     return songObject;
@@ -68,7 +68,7 @@
   let stopAllSongs = () => {
     sessionStorage.clear();
     const audios = document.querySelectorAll('audio');
-    audios.forEach((element) => {
+    audios.forEach(element => {
       element.remove();
     });
   };
@@ -156,13 +156,13 @@
   onMount(async () => {
     let data = [];
     const response = await fetch(fullUrl)
-      .then((response) => response.json())
-      .then((data) => {
+      .then(response => response.json())
+      .then(data => {
         apiData.set(data);
         numVideos.set(data.items.length);
         num = randomVideoId();
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
         return [];
       });

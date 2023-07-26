@@ -1,4 +1,5 @@
 <script>
+  // Este es el logo de entreacto  de la forma e}{a
   export let classList = '';
   export let fill = '#000';
 </script>

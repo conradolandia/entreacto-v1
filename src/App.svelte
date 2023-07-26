@@ -1,7 +1,7 @@
 <script>
   import { abiertoActo } from './lib/store';
 
-  import Nav from './lib/Nav.svelte';
+  import Main from './lib/Main.svelte';
   import Eleft from './lib/Eleft.svelte';
   import Eright from './lib/Eright.svelte';
 
@@ -65,9 +65,7 @@
   </div>
 
   <div class="w-full h-full flex justify-center items-center">
-    <!-- {#key unique} -->
-    <Nav />
-    <!-- {/key} -->
+    <Main />
   </div>
 </div>
 

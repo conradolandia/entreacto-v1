@@ -1,4 +1,5 @@
 <script>
+  // Logo de entreacto de la forma: }{
   export let fill = 'currentColor';
   export let className = '';
 </script>

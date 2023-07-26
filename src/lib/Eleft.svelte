@@ -1,4 +1,5 @@
 <script>
+  // Mitad de logo pequeño: }
   export let fill = 'currentColor';
   export let className = '';
 </script>
