@@ -4,7 +4,8 @@
 </script>
 
 <svg
-  class="{clases} fill-{fill}"
+  class={clases}
+  {fill}
   viewBox="0 0 62.146 23.005"
   xmlns="http://www.w3.org/2000/svg"
 >

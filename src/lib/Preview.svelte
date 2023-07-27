@@ -1,33 +1,49 @@
 <script>
-  import { idle } from 'svelte-idle';
+  import { onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { projectPreview } from './store.js';
+  import { push } from 'svelte-spa-router';
+  import { projectPreview, abiertoActo } from './store.js';
 
   import Eleft from './Eleft.svelte';
   import Eright from './Eright.svelte';
   import LogoEntre from './LogoEntre.svelte';
 
-  let proyecto, is_video;
+  let proyecto, unsubscribe;
+  let is_video = true;
 
   // Cargar proyecto desde store
-  projectPreview.subscribe(value => {
-    proyecto = value;
+  onMount(() => {
+    unsubscribe = projectPreview.subscribe(value => {
+      console.log('projectPreview value changed:', value);
+      // verificar que tenemos todo antes de cargar proyecto.
+      if (value && value.acf && value.acf.fondo_preview) {
+        proyecto = value;
+        const fileUrl = proyecto.acf.fondo_preview;
+        const fileExtension = fileUrl.split('.').pop();
+        is_video = fileExtension === 'mp4' || fileExtension === 'webm';
+      } else {
+        projectPreview.set(null);
+      }
+    });
   });
-
-  // Archivo de fondo, verificar si es video
-  if (proyecto) {
-    const fileUrl = proyecto.acf.fondo_preview;
-    const fileExtension = fileUrl.split('.').pop();
-    is_video = fileExtension === 'mp4' || fileExtension === 'webm';
-  }
 
   /// Destruir al alejar el mouse
   function closePreview() {
     projectPreview.set(null);
   }
 
+  function abrirProyecto(proyecto) {
+    projectPreview.set(null);
+    push(`/proyecto/${proyecto.slug}`);
+    $abiertoActo = true;
+  }
+
+  onDestroy(() => {
+    if (unsubscribe) unsubscribe();
+  });
+
   // fade
-  let fadeDuration = { duration: 300 };
+  let fadeDuration = { duration: 32 };
 </script>
 
 {#if proyecto}
@@ -49,8 +65,13 @@
     </div>
     <div class="right flex items-center">
       <Eright />
-      <div class="flex-grow text-center title">
-        <button class="slide" on:mouseleave={closePreview}>
+      <div class="flex-grow text-center relative">
+        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+        <button
+          class="slide"
+          on:mouseout={closePreview}
+          on:click={() => abrirProyecto(proyecto)}
+        >
           {proyecto.title.rendered}
         </button>
       </div>
@@ -78,12 +99,8 @@
 {/if}
 
 <style>
-  .title {
-    margin-left: 11px;
-    @apply relative;
-  }
-
   .fondo {
+    @apply bg-black;
     z-index: 49;
   }
 
@@ -93,7 +110,9 @@
       inset-0 
       m-auto 
       block 
-      mx-8 
+      pl-[18px]
+      mx-5
+      text-center
       text-5xl;
   }
 </style>

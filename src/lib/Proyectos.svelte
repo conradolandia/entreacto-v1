@@ -1,10 +1,11 @@
 <script>
   import { onMount, afterUpdate } from 'svelte';
-  import Router, { push } from 'svelte-spa-router';
+  import Router from 'svelte-spa-router';
 
   import { abiertoActo, projectPreview } from './store';
 
   import Eright from './Eright.svelte';
+  import Eleft from './Eleft.svelte';
   import Proyecto from './Proyecto.svelte';
 
   // Rutas
@@ -14,18 +15,22 @@
 
   /////////////////////////// manejar el hover
 
-  const hoverDuration = 1000;
-  let hoverTimeout;
+  const hoverDuration = 1200;
 
-  const handleMouseEnter = proyecto => {
-    if (allowPreview) {
-      hoverTimeout = setTimeout(() => {
+  let hoverTimeout,
+    lastHoveredProyecto,
+    errorMessage = null;
+
+  const previewProyecto = proyecto => {
+    lastHoveredProyecto = proyecto;
+    hoverTimeout = setTimeout(() => {
+      if (lastHoveredProyecto === proyecto) {
         projectPreview.set(proyecto);
-      }, hoverDuration);
-    }
+      }
+    }, hoverDuration);
   };
 
-  const handleMouseLeave = () => {
+  const closePreview = () => {
     clearTimeout(hoverTimeout);
   };
 
@@ -76,7 +81,6 @@
 
   let sliderRef;
   let proyectos = [];
-  let allowPreview = true;
 
   // desplazamos con la rueda
   const handleWheel = event => {
@@ -142,16 +146,6 @@
     });
   };
 
-  // Abrir proyecto desde el carrusel
-  const abrirProyecto = proyecto => {
-    allowPreview = false;
-    projectPreview.set(null);
-    $abiertoActo = true;
-    push(`/proyecto/${proyecto.slug}`);
-    clearTimeout(hoverTimeout);
-    setTimeout(() => (allowPreview = true), 600);
-  };
-
   /////////////////////////// Conseguimos los proyectos
 
   const fetchProyectos = async () => {
@@ -159,11 +153,20 @@
       const res = await fetch(
         'http://entreacto.test/wp-json/wp/v2/posts?_fields=title,slug,id,acf,excerpt&per_page=99&acf_format=standard'
       );
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       proyectos = await res.json();
-      slide.num = proyectos.length;
-      updateCarousel(slide.num, slide.visible, slide.current);
-    } catch (err) {
-      throw new Error(err);
+
+      if (proyectos) {
+        slide.num = proyectos.length;
+        updateCarousel(slide.num, slide.visible, slide.current);
+      }
+    } catch (error) {
+      console.log(error);
+      errorMessage = error.message;
     }
   };
 
@@ -174,28 +177,17 @@
 </script>
 
 <button class={$abiertoActo === true ? 'bright pointer-events-auto ml-4' : ''}>
-  <Eright
-    className="hover:fill-white"
-    fill={$abiertoActo === false ? '#fff' : '#000'}
-  />
+  <Eright fill={$abiertoActo === false ? '#fff' : '#000'} />
 </button>
-<div
-  bind:this={sliderRef}
-  on:wheel={handleWheel}
-  class="{$abiertoActo === true
-    ? 'pointer-events-auto'
-    : 'pointer-events-none'} flex-grow z-50 mr-10 ml-5 w-full h-full relative contenidoActo"
->
+<div bind:this={sliderRef} on:wheel={handleWheel} class="contenidoActo">
   {#if $abiertoActo !== true}
     {#each proyectos as proyecto, index}
+      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
       <button
         id="slide{index}"
-        class="slide {$abiertoActo === true
-          ? 'pointer-events-none'
-          : 'pointer-events-auto'}"
-        on:mouseenter={() => handleMouseEnter(proyecto)}
-        on:mouseleave={handleMouseLeave}
-        on:click={() => abrirProyecto(proyecto)}
+        class="slide"
+        on:mouseover={() => previewProyecto(proyecto)}
+        on:mouseout={closePreview}
       >
         {proyecto.title.rendered}
       </button>
@@ -204,12 +196,12 @@
     <Router {routes} />
   {/if}
 </div>
+<button class={$abiertoActo === true ? 'bleft pointer-events-auto ml-4' : ''}>
+  <Eleft fill={$abiertoActo === false ? '#fff' : '#000'} />
+</button>
 
 <style>
   .slide {
-    transform-origin: center;
-    transform: translateZ(0);
-    backface-visibility: hidden;
     @apply absolute 
       h-40 
       inset-0 
@@ -221,8 +213,21 @@
       mx-8 
       text-candela 
       text-5xl;
+    transform-origin: center;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
-  .bright {
+
+  .contenidoActo {
+    @apply pointer-events-auto 
+    z-50 
+    mx-5 
+    w-full 
+    h-full 
+    relative;
+  }
+  .bright,
+  .bleft {
     transition: all 0.4s ease-in-out;
   }
 </style>

@@ -15,9 +15,13 @@
   import Proyectos from './Proyectos.svelte';
   import Preview from './Preview.svelte';
 
-  let project;
+  let showPreview = false;
+
+  $: showPreview = $projectPreview !== null;
+
+  let proyecto;
   projectPreview.subscribe(value => {
-    project = value;
+    proyecto = value;
   });
 
   let verEntre = () => {
@@ -181,8 +185,7 @@
     </div>
   </div>
 </div>
-
-{#if project}
+{#if proyecto && showPreview}
   <Preview />
 {/if}
 
