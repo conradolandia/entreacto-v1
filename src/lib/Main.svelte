@@ -1,38 +1,83 @@
 <script>
-  import { idle } from 'svelte-idle';
+  import { onMount } from 'svelte';
+  import Router from 'svelte-spa-router';
+
   import {
     abiertoActo,
     visibleEntre,
     visibleActo,
     projectPreview,
   } from './store';
-
   import copyLink from './copyLink';
 
   import Nav from './Nav.svelte';
   import Eboth from './Eboth.svelte';
   import ButtonIcon from './ButtonIcon.svelte';
-  import Proyectos from './Proyectos.svelte';
   import Preview from './Preview.svelte';
+  import Proyectos from './Proyectos.svelte';
+  import Proyecto from './Proyecto.svelte';
 
-  let showPreview = false;
+  // Rutas
+  const routes = {
+    '/proyecto/:slug': Proyecto,
+  };
+
+  const proyectoCargado = () => {
+    console.log('Project component was loaded');
+  };
+
+  let showPreview = false,
+    intro_text,
+    proyecto;
 
   $: showPreview = $projectPreview !== null;
 
-  let proyecto;
   projectPreview.subscribe(value => {
     proyecto = value;
   });
 
-  let verEntre = () => {
+  const verEntre = () => {
     $visibleEntre = !$visibleEntre;
     $visibleActo = false;
   };
 
-  let cerrarCuarto = () => {
+  const verActo = () => {
+    $visibleActo = !$visibleActo;
+    $visibleEntre = false;
+  };
+
+  const cerrarCuarto = () => {
     $visibleActo = false;
     $abiertoActo = false;
   };
+
+  const cerrarProyecto = () => {
+    $abiertoActo = false;
+    push('/');
+  };
+
+  // fetch intro
+  const fetchIntro = async () => {
+    try {
+      const res = await fetch(
+        'http://entreacto.test/wp-json/wp/v2/pages?slug=intro&_fields=content'
+      );
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const [intro] = await res.json();
+
+      if (intro) {
+        intro_text = intro.content.rendered;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  onMount(fetchIntro);
 </script>
 
 <Nav />
@@ -70,9 +115,9 @@
       <main class="flex items-center justify-end pl-12">
         <div class="flex-grow">
           <div class="hidden md:block w-1/2 mx-auto overflow-hidden">
-            Somos una productora de cinematografía expandida. Investigamos,
-            desarrollamos y producimos experiencias. Nuestro lugar de creación
-            es el intermedio entre una idea y su puesta en escena.
+            {#if intro_text}
+              {@html intro_text}
+            {/if}
           </div>
         </div>
         <div class="flex items-center justify-center contenidoEntre p-2">
@@ -91,23 +136,21 @@
         </div>
       </main>
       <footer class="flex items-center justify-between pointer-events-auto">
-        <a href="//www.sebastianmunera.com/" target="_blank">Sebastian Múnera</a
-        >
-        <div class="text-white">
-          <div class="flex gap-[22px]">
-            <ButtonIcon
-              fill="#fff"
-              name="Message"
-              href="mailto:test@example.com?subject=Mensaje desde cuartoanimal.com"
-              target="_blank"
-            />
-            <ButtonIcon
-              fill="#fff"
-              name="Share"
-              isButton={true}
-              on:click={copyLink}
-            />
-          </div>
+        <button on:click={verActo}>actos</button>
+
+        <div class="flex gap-[22px]">
+          <ButtonIcon
+            fill="#fff"
+            name="Message"
+            href="mailto:test@example.com?subject=Mensaje desde cuartoanimal.com"
+            target="_blank"
+          />
+          <ButtonIcon
+            fill="#fff"
+            name="Share"
+            isButton={true}
+            on:click={copyLink}
+          />
         </div>
       </footer>
     </div>
@@ -119,13 +162,9 @@
     {$abiertoActo ? 'z-[100] abiertoActo' : ''}"
   >
     <div class="ui h-full w-full">
-      <header
-        class="header flex justify-between transition-all {$idle === true
-          ? 'opacity-0'
-          : 'opacity-100'}"
-      >
+      <header class="header flex justify-between transition-all">
         {#if !$visibleActo || $abiertoActo}
-          <button class="pointer-events-auto" on:click={cerrarCuarto}>
+          <button class="pointer-events-auto" on:click={cerrarProyecto}>
             <Eboth className="h-[22px] hover:fill-white" fill="#000" />
           </button>
           <div class="text-black">
@@ -149,29 +188,26 @@
       <!-- menu proyectos -->
       <main class="flex items-center justify-start">
         <Proyectos />
+        <Router {routes} on:projectLoaded={proyectoCargado} />
       </main>
       <!-- fin menu proyectos -->
-      <footer
-        class="{$idle
-          ? 'opacity-0'
-          : 'opacity-100'} footer flex justify-between transition-all}"
-      >
+      <footer class="footer flex justify-between transition-all">
         {#if !$visibleActo || $abiertoActo}
-          <div class="text-black">
-            <div class="flex items-center gap-[22px]">
-              <div
-                class="opacity-0 anuncio transition-opacity ease-in duration-700"
-              >
-                enlace copiado!
-              </div>
-              <ButtonIcon
-                fill="#000"
-                name="Share"
-                className="hover:fill-white"
-                isButton={true}
-                on:click={copyLink}
-              />
+          <button class="pointer-events-auto" on:click={cerrarProyecto}
+            >actos</button
+          >
+          <div class="flex items-center gap-[22px]">
+            <div
+              class="opacity-0 anuncio transition-opacity ease-in duration-700"
+            >
+              enlace copiado!
             </div>
+            <ButtonIcon
+              fill="#000"
+              name="Share"
+              isButton={true}
+              on:click={copyLink}
+            />
           </div>
         {:else}
           <div />

@@ -43,7 +43,7 @@
   });
 
   // fade
-  let fadeDuration = { duration: 32 };
+  let fadeDuration = { duration: 100 };
 </script>
 
 {#if proyecto}

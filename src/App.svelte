@@ -5,8 +5,7 @@
   import Eleft from './lib/Eleft.svelte';
   import Eright from './lib/Eright.svelte';
 
-  let closed = false;
-  let unique = {};
+  let closed = true;
 
   let cerrarTodo = () => {
     let elementos = document.querySelectorAll('.visibleActo, .visibleEntre');
@@ -16,10 +15,8 @@
   };
 
   let restart = () => {
-    setTimeout(() => {
-      cerrarTodo();
-      unique = {};
-    }, 1000);
+    setTimeout(() => cerrarTodo(), 1000);
+    setTimeout(() => (closed = false), 1200);
   };
 </script>
 

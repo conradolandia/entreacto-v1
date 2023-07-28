@@ -28,30 +28,59 @@ body {
   outline: none;
 }
 
-.crosshair {
-  cursor: crosshair;
+.bright,
+.bleft {
+  transition: all 0.4s ease-in-out;
+  z-index: 100;
 }
-.e-resize {
-  cursor: e-resize;
+
+.entrada > * {
+  margin-left: 25%;
+  margin-right: 25%;
 }
-.ew-resize {
-  cursor: ew-resize;
+
+.wp-block-image img {
+  width: 100%;
+  height: auto;
 }
-.grab {
-  cursor: grab;
+
+.wp-block-image.alignleft {
+  margin-left: 0;
 }
-.grabbing {
-  cursor: grabbing;
+
+.wp-block-image.alignright {
+  margin-right: 0;
 }
-.move {
-  cursor: move;
+
+.wp-block-image.alignleft figcaption {
+  width: 50%;
+  margin-left: auto;
+  text-align: right;
 }
-.pointer {
-  cursor: pointer;
+
+.wp-block-image.alignright figcaption {
+  width: 50%;
+  margin-right: auto;
+  text-align: left;
 }
-.progress {
-  cursor: progress;
+
+.wp-block-image.fullwidth {
+  margin-left: 0;
+  margin-right: 0;
 }
-.wait {
-  cursor: wait;
+
+.wp-block-image.fullwidth figcaption {
+  margin-left: 25%;
+  margin-right: 25%;
+  text-align: left;
+}
+
+.wp-block-embed.is-type-video {
+  @apply aspect-video;
+}
+
+.wp-block-embed.is-type-video iframe,
+.wp-block-embed.is-type-video .wp-block-embed__wrapper {
+  @apply w-full;
+  @apply h-full;
 }

@@ -1,17 +1,10 @@
 <script>
   import { onMount, afterUpdate } from 'svelte';
-  import Router from 'svelte-spa-router';
 
   import { abiertoActo, projectPreview } from './store';
 
   import Eright from './Eright.svelte';
   import Eleft from './Eleft.svelte';
-  import Proyecto from './Proyecto.svelte';
-
-  // Rutas
-  const routes = {
-    '/proyecto/:slug': Proyecto,
-  };
 
   /////////////////////////// manejar el hover
 
@@ -79,7 +72,7 @@
   const shrink = 0.6;
   const show = 0.7;
 
-  let sliderRef;
+  let sliderRef = null;
   let proyectos = [];
 
   // desplazamos con la rueda
@@ -97,53 +90,55 @@
 
   // actualizar el carrusel
   const updateCarousel = (num, visible, current) => {
-    const slides = Array.from(sliderRef.querySelectorAll('.slide'));
-    const layers = Math.floor(visible / 2);
-    const visibleSlides = [];
+    if (sliderRef) {
+      const slides = Array.from(sliderRef.querySelectorAll('.slide'));
+      const layers = Math.floor(visible / 2);
+      const visibleSlides = [];
 
-    for (let i = -layers; i <= layers; i++) {
-      let index = current + i;
-      if (index < 0) {
-        index = num + index;
-      } else {
-        index %= num;
+      for (let i = -layers; i <= layers; i++) {
+        let index = current + i;
+        if (index < 0) {
+          index = num + index;
+        } else {
+          index %= num;
+        }
+        visibleSlides.push(index);
       }
-      visibleSlides.push(index);
+
+      slides.forEach((slide, i) => {
+        const layer = visibleSlides.indexOf(i) - layers;
+        const scale = shrink ** Math.abs(layer);
+        const isCurrentSlide = i === current;
+        const opacity = scale;
+
+        let translate = 0;
+
+        // desactivamos eventos del raton excepto en current slide
+        slide.disabled = !isCurrentSlide;
+        slide.classList.toggle('pointer-events-none', !isCurrentSlide);
+
+        // trasladamos y escalamos los demas slides
+        for (let j = 1; j <= Math.abs(layer); j++) {
+          translate += show * shrink ** (j - 1);
+        }
+
+        if (visible % 2 === 0 && layer === 0) {
+          translate = 0;
+        } else if (visible % 2 === 1) {
+          translate += show * shrink ** Math.abs(layers);
+        }
+
+        translate *= 100;
+        if (layer < 0) translate *= -1;
+
+        slide.style.transform = `translateY(${translate}%) scale(${scale})`;
+        slide.style.opacity = opacity;
+        slide.style.zIndex = (layers - Math.abs(layer)) * 5;
+        slide.style.color = isCurrentSlide
+          ? mainColor
+          : getColorForPosition(current - i);
+      });
     }
-
-    slides.forEach((slide, i) => {
-      const layer = visibleSlides.indexOf(i) - layers;
-      const scale = shrink ** Math.abs(layer);
-      const isCurrentSlide = i === current;
-      const opacity = scale;
-
-      let translate = 0;
-
-      // desactivamos eventos del raton excepto en current slide
-      slide.disabled = !isCurrentSlide;
-      slide.classList.toggle('pointer-events-none', !isCurrentSlide);
-
-      // trasladamos y escalamos los demas slides
-      for (let j = 1; j <= Math.abs(layer); j++) {
-        translate += show * shrink ** (j - 1);
-      }
-
-      if (visible % 2 === 0 && layer === 0) {
-        translate = 0;
-      } else if (visible % 2 === 1) {
-        translate += show * shrink ** Math.abs(layers);
-      }
-
-      translate *= 100;
-      if (layer < 0) translate *= -1;
-
-      slide.style.transform = `translateY(${translate}%) scale(${scale})`;
-      slide.style.opacity = opacity;
-      slide.style.zIndex = (layers - Math.abs(layer)) * 5;
-      slide.style.color = isCurrentSlide
-        ? mainColor
-        : getColorForPosition(current - i);
-    });
   };
 
   /////////////////////////// Conseguimos los proyectos
@@ -160,7 +155,7 @@
 
       proyectos = await res.json();
 
-      if (proyectos) {
+      if (proyectos && sliderRef) {
         slide.num = proyectos.length;
         updateCarousel(slide.num, slide.visible, slide.current);
       }
@@ -176,11 +171,11 @@
   afterUpdate(fetchProyectos);
 </script>
 
-<button class={$abiertoActo === true ? 'bright pointer-events-auto ml-4' : ''}>
-  <Eright fill={$abiertoActo === false ? '#fff' : '#000'} />
-</button>
-<div bind:this={sliderRef} on:wheel={handleWheel} class="contenidoActo">
-  {#if $abiertoActo !== true}
+{#if !$abiertoActo}
+  <button class={$abiertoActo ? 'bright pointer-events-auto ml-4' : ''}>
+    <Eright fill={$abiertoActo ? '#000' : '#fff'} />
+  </button>
+  <div bind:this={sliderRef} on:wheel={handleWheel} class="contenidoActo">
     {#each proyectos as proyecto, index}
       <!-- svelte-ignore a11y-mouse-events-have-key-events -->
       <button
@@ -192,13 +187,11 @@
         {proyecto.title.rendered}
       </button>
     {/each}
-  {:else}
-    <Router {routes} />
-  {/if}
-</div>
-<button class={$abiertoActo === true ? 'bleft pointer-events-auto ml-4' : ''}>
-  <Eleft fill={$abiertoActo === false ? '#fff' : '#000'} />
-</button>
+  </div>
+  <button class={$abiertoActo ? 'bleft pointer-events-auto mr-4' : ''}>
+    <Eleft fill={$abiertoActo ? '#000' : '#fff'} />
+  </button>
+{/if}
 
 <style>
   .slide {
@@ -225,9 +218,5 @@
     w-full 
     h-full 
     relative;
-  }
-  .bright,
-  .bleft {
-    transition: all 0.4s ease-in-out;
   }
 </style>

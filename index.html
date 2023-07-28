@@ -2,11 +2,20 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="/entreacto-sm-d.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="entreacto">
+    <meta name="apple-mobile-web-app-title" content="entreacto">
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-navbutton-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-starturl" content="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>entre}{acto</title>
   </head>
-  <body class="grab">
+  <body class="cursor-grab">
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
     <!-- Google tag (gtag.js) -->
