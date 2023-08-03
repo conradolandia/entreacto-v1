@@ -1,26 +1,32 @@
 <script>
-  import { onMount, afterUpdate } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { abiertoActo, projectPreview } from './store';
 
   import Eright from './Eright.svelte';
   import Eleft from './Eleft.svelte';
+  import ButtonTicker from './ButtonTicker.svelte';
 
   /////////////////////////// manejar el hover
 
-  const hoverDuration = 1200;
+  const hoverDuration = 1000;
 
   let hoverTimeout,
     lastHoveredProyecto,
-    errorMessage = null;
+    errorMessage = null,
+    isScrolling = false,
+    scrollTimeout;
 
   const previewProyecto = proyecto => {
-    lastHoveredProyecto = proyecto;
-    hoverTimeout = setTimeout(() => {
-      if (lastHoveredProyecto === proyecto) {
-        projectPreview.set(proyecto);
-      }
-    }, hoverDuration);
+    if (!isScrolling) {
+      // Solo abrir preview del proyecto si no estamos haciendo scroll
+      lastHoveredProyecto = proyecto;
+      hoverTimeout = setTimeout(() => {
+        if (lastHoveredProyecto === proyecto) {
+          projectPreview.set(proyecto);
+        }
+      }, hoverDuration);
+    }
   };
 
   const closePreview = () => {
@@ -42,7 +48,7 @@
     'rgb(76, 204, 250)',
     'rgb(87, 125, 250)',
     'rgb(149, 102, 250)',
-    'rgb(255, 255, 255)',
+    'rgb(255, 220, 150)',
     'rgb(250, 206, 87)',
     'rgb(250, 166, 76)',
     'rgb(250, 105, 61)',
@@ -51,7 +57,7 @@
     'rgb(255, 50, 0)',
   ];
 
-  const mainColor = colors[4];
+  const mainColor = 'rgb(255,255,255)';
 
   // distribuir colores de aceurdo a la posicion del elemento en el slider
   const getColorForPosition = position => {
@@ -64,21 +70,45 @@
   };
 
   /////////////// constantes:
-  // shrink: cuanto se reduce la escala de cada elemento repsecto al anterior
-  // show: porcentaje del elemento que queda expuesto cuando está por detrás de otro
+  // factorReduccion: cuanto se reduce la escala de cada elemento repsecto al anterior
+  // factorExposicion: porcentaje del elemento que queda expuesto cuando está por detrás de otro
   // sliderRef: contenedor del slider
   // proyectos: array de proyectos cargados
 
-  const shrink = 0.6;
-  const show = 0.7;
+  const factorReduccion = 0.6;
+  const factorExposicion = 2.0;
 
   let sliderRef = null;
   let proyectos = [];
 
   // desplazamos con la rueda
+  let insensibilidadScroll = 500; // mayor valor = más scrolling para cambiar
+  let sumaScroll = 0;
+  let startY;
+
+  const handleTouchStart = event => {
+    startY = event.touches[0].clientY; // Posición donde empieza el touch event
+  };
+
+  const handleTouchMove = event => {
+    const deltaY = startY - event.touches[0].clientY; // Distancia que se ha movido el dedo
+    handleWheel(deltaY);
+  };
+
   const handleWheel = event => {
-    const index = event.deltaY > 0 ? slide.current + 1 : slide.current - 1;
-    switchSlide(index);
+    sumaScroll += Math.abs(event.deltaY);
+
+    isScrolling = true; // Scrolling es true mientras hacemos scroll
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      isScrolling = false; // Resetear estado del scroll después de 300ms sin eventos de la rueda
+    }, 300);
+
+    if (sumaScroll >= insensibilidadScroll) {
+      const index = event.deltaY > 0 ? slide.current + 1 : slide.current - 1;
+      switchSlide(index);
+      sumaScroll = 0;
+    }
   };
 
   // cambiar slide
@@ -107,7 +137,7 @@
 
       slides.forEach((slide, i) => {
         const layer = visibleSlides.indexOf(i) - layers;
-        const scale = shrink ** Math.abs(layer);
+        const scale = factorReduccion ** Math.abs(layer);
         const isCurrentSlide = i === current;
         const opacity = scale;
 
@@ -119,13 +149,13 @@
 
         // trasladamos y escalamos los demas slides
         for (let j = 1; j <= Math.abs(layer); j++) {
-          translate += show * shrink ** (j - 1);
+          translate += factorExposicion * factorReduccion ** (j - 1);
         }
 
         if (visible % 2 === 0 && layer === 0) {
           translate = 0;
         } else if (visible % 2 === 1) {
-          translate += show * shrink ** Math.abs(layers);
+          translate += factorExposicion * factorReduccion ** Math.abs(layers);
         }
 
         translate *= 100;
@@ -141,24 +171,27 @@
     }
   };
 
+  function updateWhenReady() {
+    if (proyectos && sliderRef) {
+      slide.num = proyectos.length;
+      setTimeout(() => {
+        updateCarousel(slide.num, slide.visible, slide.current);
+      }, 0);
+    }
+  }
+
   /////////////////////////// Conseguimos los proyectos
 
   const fetchProyectos = async () => {
     try {
       const res = await fetch(
-        'http://entreacto.test/wp-json/wp/v2/posts?_fields=title,slug,id,acf,excerpt&per_page=99&acf_format=standard'
+        'https://www.entreacto.co/admin/wp-json/wp/v2/posts?_fields=title,slug,id,acf,excerpt&per_page=99&acf_format=standard'
       );
-
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-
       proyectos = await res.json();
-
-      if (proyectos && sliderRef) {
-        slide.num = proyectos.length;
-        updateCarousel(slide.num, slide.visible, slide.current);
-      }
+      updateWhenReady();
     } catch (error) {
       console.log(error);
       errorMessage = error.message;
@@ -167,50 +200,38 @@
 
   /////////////////////////// Montar funcion y actualizar
 
+  $: proyectos && updateWhenReady();
+  $: sliderRef && updateWhenReady();
+
   onMount(fetchProyectos);
-  afterUpdate(fetchProyectos);
 </script>
 
 {#if !$abiertoActo}
-  <button class={$abiertoActo ? 'bright pointer-events-auto ml-4' : ''}>
-    <Eright fill={$abiertoActo ? '#000' : '#fff'} />
+  <button>
+    <Eright fill="#fff" />
   </button>
-  <div bind:this={sliderRef} on:wheel={handleWheel} class="contenidoActo">
-    {#each proyectos as proyecto, index}
-      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-      <button
-        id="slide{index}"
-        class="slide"
-        on:mouseover={() => previewProyecto(proyecto)}
-        on:mouseout={closePreview}
-      >
-        {proyecto.title.rendered}
-      </button>
+  <div
+    bind:this={sliderRef}
+    on:wheel={handleWheel}
+    on:wheel={closePreview}
+    on:touchstart={handleTouchStart}
+    on:touchmove={handleTouchMove}
+    class="contenidoActo"
+  >
+    {#each proyectos as proyecto}
+      <ButtonTicker
+        on:mouseenter={() => previewProyecto(proyecto)}
+        on:mouseleave={closePreview}
+        buttonText={proyecto.title.rendered}
+      />
     {/each}
   </div>
-  <button class={$abiertoActo ? 'bleft pointer-events-auto mr-4' : ''}>
-    <Eleft fill={$abiertoActo ? '#000' : '#fff'} />
+  <button>
+    <Eleft fill="#fff" />
   </button>
 {/if}
 
 <style>
-  .slide {
-    @apply absolute 
-      h-40 
-      inset-0 
-      m-auto 
-      block 
-      transition-all 
-      ease-out 
-      duration-700 
-      mx-8 
-      text-candela 
-      text-5xl;
-    transform-origin: center;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-
   .contenidoActo {
     @apply pointer-events-auto 
     z-50 

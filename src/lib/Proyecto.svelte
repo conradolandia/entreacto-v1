@@ -6,18 +6,22 @@
   import Eright from './Eright.svelte';
   import Eleft from './Eleft.svelte';
   import Spinner from './Spinner.svelte';
+  import ProyectoFooter from './ProyectoFooter.svelte';
 
   export let params;
 
-  const BASE_URL = 'http://entreacto.test/wp-json/wp/v2/posts';
+  const BASE_URL = 'https://www.entreacto.co/admin/wp-json/wp/v2/posts';
   const ALL_FIELDS = '_fields=title,slug';
   const SINGLE_FIELDS = '_fields=title,slug,content,acf&acf_format=standard';
 
   const dispatch = createEventDispatcher();
 
-  let title,
+  let bg,
+    title,
+    subtitle,
     slug,
     content,
+    colaboradores,
     prevProyectoSlug,
     nextProyectoSlug,
     prevProyectoTitle,
@@ -72,8 +76,11 @@
 
       if (proyectos && proyecto) {
         title = proyecto.title.rendered;
+        subtitle = proyecto.acf.subtitulo;
         slug = proyecto.slug;
         content = proyecto.content.rendered;
+        colaboradores = proyecto.acf.colaboradores;
+        bg = proyecto.acf.color_de_fondo;
 
         let { prevProyecto, nextProyecto } = setPrevAndNextProject(
           proyectos,
@@ -99,6 +106,8 @@
   const getPrevProyecto = () => push(`/proyecto/${prevProyectoSlug}`);
   const getNextProyecto = () => push(`/proyecto/${nextProyectoSlug}`);
 
+  const scrollDown = () => cont.scrollBy({ top: 600, behavior: 'smooth' });
+
   $: {
     if (params) {
       isLoading = true;
@@ -109,49 +118,62 @@
 </script>
 
 {#if $abiertoActo}
-  <button
-    title={prevProyectoTitle}
-    class="bright pointer-events-auto ml-4"
-    on:click={getPrevProyecto}
-  >
-    <Eright fill="#000" />
-  </button>
-  {#if isLoading}
-    <div class="loader">
-      <Spinner />
-    </div>
-  {:else}
-    <div class="contenido" bind:this={cont} on:scroll={onScrollAction}>
-      {#if errorMessage}
-        <div class="error">
-          <p>{errorMessage}</p>
-        </div>
-      {/if}
-      <h1
-        class="post-title text-black text-center
+  <div class="contenedor" style="background-color: {bg};">
+    <button
+      title={prevProyectoTitle}
+      class="bright pointer-events-auto ml-4"
+      on:click={getPrevProyecto}
+    >
+      <Eright fill="#000" />
+    </button>
+    {#if isLoading}
+      <div class="loader">
+        <Spinner />
+      </div>
+    {:else}
+      <div class="contenido" bind:this={cont} on:scroll={onScrollAction}>
+        {#if errorMessage}
+          <div class="error">
+            <p>{errorMessage}</p>
+          </div>
+        {/if}
+        <h1
+          {title}
+          class="post-title text-black text-center
     {isElementAtTop ? 'stick' : 'nostick'}"
-        bind:this={elem}
-        on:click={cerrarProyecto}
-      >
-        {title}
-      </h1>
-      <div class="absolute bottom-6">
-        <div class="text-black animate-bounce text-2xl w-12 h-12">↧</div>
-      </div>
-      <div class="absolute top-full pointer-events-auto">
-        <div class="entrada prose-2xl mb-16 md:text-justify">
-          {@html content}
+          style="background-color: {isElementAtTop && bg ? bg : ''};"
+          bind:this={elem}
+          on:click={cerrarProyecto}
+        >
+          {title}
+          <span title={subtitle} class="block">{subtitle}</span>
+        </h1>
+        <div class="absolute bottom-6">
+          <button
+            on:click={scrollDown}
+            class="text-black animate-bounce text-2xl w-12 h-12"
+          >
+            ↧
+          </button>
+        </div>
+        <div class="absolute top-full pointer-events-auto">
+          <div class="entrada prose-2xl mb-32 md:text-justify">
+            {@html content}
+          </div>
+          <div class="post-footer">
+            <ProyectoFooter {colaboradores} />
+          </div>
         </div>
       </div>
-    </div>
-  {/if}
-  <button
-    title={nextProyectoTitle}
-    class="bleft pointer-events-auto mr-4"
-    on:click={getNextProyecto}
-  >
-    <Eleft fill="#000" />
-  </button>
+    {/if}
+    <button
+      title={nextProyectoTitle}
+      class="bleft pointer-events-auto mr-4"
+      on:click={getNextProyecto}
+    >
+      <Eleft fill="#000" />
+    </button>
+  </div>
 {/if}
 
 <style>
@@ -159,17 +181,37 @@
     @apply grid justify-items-center items-center w-full h-full;
   }
   .post-title {
-    @apply z-10 py-16 w-1/2 flex justify-center items-center text-3xl transform-gpu transition-transform scale-150;
+    @apply z-10 py-16 w-1/2 flex flex-col justify-center items-center text-3xl transform-gpu transition-all scale-150 duration-500;
     pointer-events: all;
   }
 
+  .post-title span {
+    display: none;
+    @apply transition-all;
+    font-size: 50%;
+  }
+
+  .post-title.stick span {
+    display: block;
+  }
+
+  .contenedor,
   .contenido {
-    @apply relative w-full h-full grid grid-flow-row justify-items-center items-center overflow-hidden overflow-y-scroll pointer-events-auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
     margin-left: calc(-3rem - 3px);
     margin-right: calc(-3rem - 3px);
     width: calc(100% + calc((3rem + 3px) * 2));
+    align-items: center;
+  }
+
+  .contenedor {
+    @apply h-full flex transition-all duration-500;
+    padding: 0 calc(3rem + 3px);
+  }
+
+  .contenido {
+    @apply relative h-full grid grid-flow-row justify-items-center overflow-hidden overflow-y-scroll pointer-events-auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
   }
 
   .contenido::-webkit-scrollbar {
@@ -177,6 +219,10 @@
     width: 0px;
   }
 
+  .post-footer {
+    margin: 0 12%;
+    margin-bottom: 35px;
+  }
   .stick {
     @apply sticky top-0 bg-white scale-100 w-full;
   }

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import Router from 'svelte-spa-router';
+  import Router, { push } from 'svelte-spa-router';
 
   import {
     abiertoActo,
@@ -8,7 +8,6 @@
     visibleActo,
     projectPreview,
   } from './store';
-  import copyLink from './copyLink';
 
   import Nav from './Nav.svelte';
   import Eboth from './Eboth.svelte';
@@ -20,10 +19,6 @@
   // Rutas
   const routes = {
     '/proyecto/:slug': Proyecto,
-  };
-
-  const proyectoCargado = () => {
-    console.log('Project component was loaded');
   };
 
   let showPreview = false,
@@ -52,15 +47,15 @@
   };
 
   const cerrarProyecto = () => {
-    $abiertoActo = false;
     push('/');
+    $abiertoActo = false;
   };
 
   // fetch intro
   const fetchIntro = async () => {
     try {
       const res = await fetch(
-        'http://entreacto.test/wp-json/wp/v2/pages?slug=intro&_fields=content'
+        'https://www.entreacto.co/admin/wp-json/wp/v2/pages?slug=intro&_fields=content'
       );
 
       if (!res.ok) {
@@ -138,18 +133,18 @@
       <footer class="flex items-center justify-between pointer-events-auto">
         <button on:click={verActo}>actos</button>
 
-        <div class="flex gap-[22px]">
+        <div class="flex gap-[22px] relative">
           <ButtonIcon
             fill="#fff"
             name="Message"
-            href="mailto:test@example.com?subject=Mensaje desde cuartoanimal.com"
+            href="mailto:test@example.com?subject=Mensaje desde entreacto.co"
             target="_blank"
           />
           <ButtonIcon
             fill="#fff"
+            textColor="white"
             name="Share"
             isButton={true}
-            on:click={copyLink}
           />
         </div>
       </footer>
@@ -157,9 +152,9 @@
   </div>
   <!-- ACTO -->
   <div
-    class="acto bg-black text-white cortina
+    class="acto cortina bg-black text-white
     {$visibleActo ? 'visibleActo' : ''} 
-    {$abiertoActo ? 'z-[100] abiertoActo' : ''}"
+    {$abiertoActo ? 'abiertoActo' : ''}"
   >
     <div class="ui h-full w-full">
       <header class="header flex justify-between transition-all">
@@ -167,16 +162,21 @@
           <button class="pointer-events-auto" on:click={cerrarProyecto}>
             <Eboth className="h-[22px] hover:fill-white" fill="#000" />
           </button>
-          <div class="text-black">
-            <div class="flex gap-[22px]">
-              <ButtonIcon
-                fill="#000"
-                name="Instagram"
-                className="hover:fill-white"
-                href="//www.instagram.com/cuarto__animal/"
-                target="_blank"
-              />
-            </div>
+          <div class="flex gap-[22px]">
+            <ButtonIcon
+              fill="#000"
+              className="hover:fill-white"
+              name="Instagram"
+              href="//www.instagram.com/entre__acto/"
+              target="_blank"
+            />
+            <ButtonIcon
+              fill="#000"
+              className="hover:fill-white"
+              name="vimeo"
+              href="//vimeo.com/user183118141"
+              target="_blank"
+            />
           </div>
         {:else}
           <div />
@@ -188,7 +188,7 @@
       <!-- menu proyectos -->
       <main class="flex items-center justify-start">
         <Proyectos />
-        <Router {routes} on:projectLoaded={proyectoCargado} />
+        <Router {routes} />
       </main>
       <!-- fin menu proyectos -->
       <footer class="footer flex justify-between transition-all">
@@ -197,16 +197,11 @@
             >actos</button
           >
           <div class="flex items-center gap-[22px]">
-            <div
-              class="opacity-0 anuncio transition-opacity ease-in duration-700"
-            >
-              enlace copiado!
-            </div>
             <ButtonIcon
               fill="#000"
+              textColor="black"
               name="Share"
               isButton={true}
-              on:click={copyLink}
             />
           </div>
         {:else}
@@ -286,7 +281,7 @@
   }
 
   .abiertoActo {
-    transition: all 0.8s ease-in-out;
+    transition: all 1s ease-in-out;
     z-index: 100;
     width: 100vw;
     transform: translateX(-50%);

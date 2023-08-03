@@ -6,6 +6,9 @@
   export let href = '#';
   export let target = '_self';
   export let isButton = false;
+  export let textColor = 'black';
+
+  let anuncio;
 
   let iconShare = `<path d="M0 0a1.783 1.783 0 0 1-1.801-1.773 1.793 1.793 0 0 1 1.78-1.799A1.794 1.794 0 0 1 1.78-1.794 1.784 1.784 0 0 1 0 0m-1.801-15.374c-.016-.983.791-1.803 1.785-1.813.966-.01 1.782.796 1.796 1.773a1.8 1.8 0 0 1-1.771 1.813c-.971.02-1.794-.785-1.81-1.773m-10.01 9.653a2.875 2.875 0 0 1-2.881-2.842c-.031-1.544 1.236-2.853 2.816-2.889 1.563-.037 2.875 1.23 2.91 2.809.035 1.585-1.233 2.887-2.845 2.922m3.744.444 3.422 2.207c.215.139.426.284.646.415.097.057.116.121.098.224a3.683 3.683 0 0 0 .302 2.275c.619 1.286 1.64 2.062 3.062 2.239 1.959.246 3.756-.941 4.249-2.848.414-1.598-.032-2.981-1.305-4.046-1.515-1.269-3.767-1.158-5.18.22l-.103.097-4.149-2.664c.14-.468.207-.944.207-1.429 0-.485-.066-.96-.208-1.433l4.116-2.643c.317.234.599.48.916.669 1.823 1.086 4.199.494 5.319-1.312 1.302-2.099.425-4.829-1.875-5.741-1.383-.548-2.716-.359-3.882.557-1.183.93-1.667 2.188-1.466 3.691.019.146-.01.226-.141.309-1.294.826-2.584 1.66-3.874 2.492l-.155.097c-1.11-1.194-2.474-1.785-4.101-1.685-1.398.086-2.573.682-3.478 1.744a4.986 4.986 0 0 0 .053 6.568c.998 1.118 2.263 1.695 3.765 1.694 1.496-.002 2.741-.598 3.762-1.697" transform="matrix(.29579 0 0 -.29579 5.086 .626)"/>`;
   let iconFacebook = `<path d="M0 0c-.025.228-.057.387-.058.548C-.061 2.885-.06 5.221-.06 7.636h2.565l.501 3.26H.029c0 .948-.078 1.839.026 2.708.075.623.622.924 1.252.945.61.021 1.222.005 1.894.005v3.186c-1.249-.055-2.491.02-3.681-.194-1.761-.317-2.961-1.951-3.005-3.817-.022-.919-.004-1.84-.004-2.841h-2.759V7.63h2.711V.007c-1.892.087-3.844-.369-5.661.587-1.987 1.045-3.077 2.712-3.107 4.962-.045 3.499-.041 7-.003 10.499.034 3.087 2.509 5.52 5.585 5.536 3.476.018 6.952.019 10.429 0a5.58 5.58 0 0 0 5.566-5.551 720.46 720.46 0 0 0 0-10.499A5.573 5.573 0 0 0 3.769.004C2.521-.019 1.273 0 0 0" transform="matrix(.29354 0 0 -.29354 3.622 6.342)" />`;
@@ -13,65 +16,130 @@
   let iconVimeo = `<path d="M0 0a21.49 21.49 0 0 0-5.509-7.355c-.549-.476-1.26-.799-1.943-1.077-.778-.317-1.522-.079-1.986.61-.423.626-.804 1.315-1.033 2.031-.535 1.666-.954 3.368-1.45 5.046a6.55 6.55 0 0 1-.59 1.349c-.319.565-.61.612-1.161.271-.232-.144-.458-.298-.739-.481l-.763.934c.902.793 1.777 1.585 2.678 2.346.374.316.784.604 1.213.839 1.041.57 2.108.259 2.533-.849.335-.874.458-1.83.658-2.754.243-1.123.464-2.251.704-3.374.042-.194.124-.382.205-.565.34-.767.808-.886 1.288-.211a23.115 23.115 0 0 1 1.733 2.9c.254.496.33 1.12-.13 1.595-.428.444-.978.295-1.499.184-.105-.023-.206-.065-.375-.12.54 2.377 2.204 3.721 4.44 3.636C-.611 4.912.112 4.306.359 3.212.611 2.099.465 1.018 0 0m3.455-1.823h-.006c0 1.656-.004 3.311.001 4.967.009 3.427-2.402 5.849-5.838 5.851-3.335.002-6.67-.007-10.005-.002-3.232.004-5.731-2.446-5.744-5.67-.014-3.382-.017-6.764-.007-10.146.011-3.345 2.439-5.766 5.785-5.776 3.359-.01 6.717-.011 10.075 0 3.307.011 5.724 2.435 5.738 5.738.006 1.679.001 3.359.001 5.038" transform="matrix(.29389 0 0 -.29389 5.334 2.644)" />`;
   let iconMessage = `<path d="M0 0c-.092-.075-.177-.133-.249-.204-1.047-1.045-2.092-2.092-3.14-3.137-.094-.094-.159-.164-.093-.328.418-1.056.819-2.12 1.225-3.181.303-.794.608-1.588.907-2.384.14-.371.37-.639.778-.705.551-.09.929.17 1.134.777.7 2.074 1.396 4.15 2.096 6.224C3.627-.065 4.6 2.807 5.57 5.68c.217.64.103 1.082-.344 1.371-.338.219-.685.158-1.038.04-2.103-.703-4.207-1.404-6.31-2.106l-8.545-2.85c-.294-.097-.573-.215-.727-.511-.307-.59-.046-1.188.646-1.451 1.805-.688 3.612-1.368 5.415-2.06.19-.073.304-.062.453.088C-3.841-.746-2.791.296-1.743 1.341c.07.069.141.136.188.18L0 0m-.388-12.115c-1.343-.008-2.508.809-2.987 2.075-.686 1.814-1.388 3.621-2.071 5.436-.139.369-.381.594-.739.73-1.788.678-3.574 1.361-5.36 2.045-1.302.498-2.04 1.44-2.123 2.835-.086 1.431.823 2.651 2.286 3.139 2.996 1.002 5.994 1.999 8.992 2.998 2.024.675 4.047 1.356 6.075 2.021 1.417.464 2.842-.018 3.631-1.222.576-.878.663-1.827.33-2.813A6668.667 6668.667 0 0 0 2.543-9.938C2.08-11.3.966-12.106-.388-12.115" transform="matrix(.29516 0 0 -.296 4.036 2.764)" />`;
   let iconContact = `<path d="M0 0c.087.055.14.088.192.123 1.336.892 2.673 1.783 4.006 2.679a.601.601 0 0 0 .355.105c3.755-.002 7.51-.002 11.265 0 .168 0 .341.007.504.045.718.166 1.118.796 1.118 1.488-.003 3.819-.001 7.638-.003 11.457 0 .146-.011.299-.052.439-.206.708-.728 1.097-1.469 1.1-.822.004-1.645.001-2.466.001-3.957 0-7.914.002-11.87-.006a1.838 1.838 0 0 1-.74-.143c-.587-.272-.842-.766-.841-1.41C.001 10.654 0 5.429 0 .205Zm-2.187 8.064c0 2.599.001 5.198-.001 7.797-.001.872.234 1.667.777 2.355.646.82 1.494 1.285 2.536 1.379.29.027.582.028.874.028 4.625.002 9.25.002 13.876 0 .976 0 1.848-.294 2.568-.97.76-.714 1.167-1.598 1.168-2.643.006-3.946.012-7.892-.01-11.838-.005-.938-.403-1.749-1.078-2.406-.734-.716-1.627-1.045-2.649-1.044-3.56.003-7.119.002-10.678-.003a.618.618 0 0 1-.321-.096C3.677-.17 2.486-.974 1.289-1.767c-.811-.536-1.653-.581-2.481-.056-.679.43-.992 1.085-.994 1.883-.004 2.068-.001 4.137-.001 6.206Z" transform="matrix(.29122 0 0 -.29104 .637 5.712)" /><path d="M1206.612 3873.538h10.879v-2.165h-10.879zM1206.611 3879.345h10.884v-2.154h-10.884z" transform="matrix(.29122 0 0 -.29104 -349.802 1130.639)" />`;
+
+  const fallbackCopyTextToClipboard = text => {
+    var textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      console.log('Fallback: Copying text command was ' + msg);
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  };
+
+  const copyTextToClipboard = text => {
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(text);
+      return;
+    }
+    navigator.clipboard.writeText(text).then(
+      function () {
+        console.log('Async: Copying to clipboard was successful!');
+      },
+      function (err) {
+        console.error('Async: Could not copy text: ', err);
+      }
+    );
+  };
+
+  const copyLink = () => {
+    copyTextToClipboard(location.href);
+    anuncio.classList.remove('opacity-0');
+    setTimeout(() => {
+      anuncio.classList.add('opacity-0');
+    }, 3000);
+  };
 </script>
 
-{#if !isButton}
-  <a {href} {target} class="block pointer-events-auto h-[22px]">
-    <svg
-      viewBox="0 0 6.35 6.35"
-      xmlns="http://www.w3.org/2000/svg"
-      class="{className} h-[22px]"
-      {fill}
-    >
-      {#if icon === 'facebook'}
-        {@html iconFacebook}
-      {/if}
-      {#if icon === 'instagram'}
-        {@html iconInstagram}
-      {/if}
-      {#if icon === 'vimeo'}
-        {@html iconVimeo}
-      {/if}
-      {#if icon === 'message'}
-        {@html iconMessage}
-      {/if}
-      {#if icon === 'contact'}
-        {@html iconContact}
-      {/if}
-      {#if icon === 'share'}
+<div class="relative">
+  {#if !isButton}
+    <a {href} {target} class="block pointer-events-auto h-[22px]">
+      <svg
+        viewBox="0 0 6.35 6.35"
+        xmlns="http://www.w3.org/2000/svg"
+        class="{className} h-[22px]"
+        {fill}
+      >
+        {#if icon === 'facebook'}
+          {@html iconFacebook}
+        {/if}
+        {#if icon === 'instagram'}
+          {@html iconInstagram}
+        {/if}
+        {#if icon === 'vimeo'}
+          {@html iconVimeo}
+        {/if}
+        {#if icon === 'message'}
+          {@html iconMessage}
+        {/if}
+        {#if icon === 'contact'}
+          {@html iconContact}
+        {/if}
+        {#if icon === 'share'}
+          {@html iconShare}
+        {/if}
+      </svg>
+    </a>
+  {:else if icon !== 'share'}
+    <button class="pointer-events-auto" on:click>
+      <svg
+        viewBox="0 0 6.35 6.35"
+        xmlns="http://www.w3.org/2000/svg"
+        class="{className} h-[22px]"
+        {fill}
+      >
+        {#if icon === 'facebook'}
+          {@html iconFacebook}
+        {/if}
+        {#if icon === 'instagram'}
+          {@html iconInstagram}
+        {/if}
+        {#if icon === 'vimeo'}
+          {@html iconVimeo}
+        {/if}
+        {#if icon === 'message'}
+          {@html iconMessage}
+        {/if}
+        {#if icon === 'contact'}
+          {@html iconContact}
+        {/if}
+      </svg>
+    </button>
+  {:else}
+    <button class="pointer-events-auto" on:click={copyLink}>
+      <svg
+        viewBox="0 0 6.35 6.35"
+        xmlns="http://www.w3.org/2000/svg"
+        class="{className} h-[22px]"
+        {fill}
+      >
         {@html iconShare}
-      {/if}
-    </svg>
-  </a>
-{:else}
-  <button class="pointer-events-auto" on:click>
-    <svg
-      viewBox="0 0 6.35 6.35"
-      xmlns="http://www.w3.org/2000/svg"
-      class="{className} h-[22px]"
-      {fill}
+      </svg>
+    </button>
+  {/if}
+  {#if icon === 'share'}
+    <div
+      bind:this={anuncio}
+      class="anuncio text-{textColor} text-xs opacity-0 transition-opacity ease-in duration-700 pointer-events-none absolute top-full right-0 w-32 text-right"
     >
-      {#if icon === 'facebook'}
-        {@html iconFacebook}
-      {/if}
-      {#if icon === 'instagram'}
-        {@html iconInstagram}
-      {/if}
-      {#if icon === 'vimeo'}
-        {@html iconVimeo}
-      {/if}
-      {#if icon === 'message'}
-        {@html iconMessage}
-      {/if}
-      {#if icon === 'contact'}
-        {@html iconContact}
-      {/if}
-      {#if icon === 'share'}
-        {@html iconShare}
-      {/if}
-    </svg>
-  </button>
-{/if}
+      enlace copiado!
+    </div>
+  {/if}
+</div>
 
 <style>
   svg {
