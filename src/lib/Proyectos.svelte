@@ -82,15 +82,18 @@
   let proyectos = [];
 
   // desplazamos con la rueda
-  let insensibilidadScroll = 500; // mayor valor = más scrolling para cambiar
+  let insensibilidadScroll = 400; // mayor valor = más scrolling para cambiar
   let sumaScroll = 0;
   let startY;
 
   const handleTouchStart = event => {
+    console.log('Touch start');
     startY = event.touches[0].clientY; // Posición donde empieza el touch event
   };
 
   const handleTouchMove = event => {
+    console.log('touch move');
+    event.preventDefault();
     const deltaY = startY - event.touches[0].clientY; // Distancia que se ha movido el dedo
     handleWheel(deltaY);
   };
@@ -118,6 +121,8 @@
     updateCarousel(slide.num, slide.visible, slide.current);
   };
 
+  let slidesState = Array(slide.num).fill(false); // Assuming num is the total number of slides.
+
   // actualizar el carrusel
   const updateCarousel = (num, visible, current) => {
     if (sliderRef) {
@@ -139,6 +144,7 @@
         const layer = visibleSlides.indexOf(i) - layers;
         const scale = factorReduccion ** Math.abs(layer);
         const isCurrentSlide = i === current;
+        slidesState[i] = isCurrentSlide;
         const opacity = scale;
 
         let translate = 0;
@@ -168,6 +174,8 @@
           ? mainColor
           : getColorForPosition(current - i);
       });
+
+      slidesState = slidesState;
     }
   };
 
@@ -212,14 +220,15 @@
   </button>
   <div
     bind:this={sliderRef}
-    on:wheel={handleWheel}
-    on:wheel={closePreview}
     on:touchstart={handleTouchStart}
     on:touchmove={handleTouchMove}
+    on:wheel={handleWheel}
+    on:wheel={closePreview}
     class="contenidoActo"
   >
-    {#each proyectos as proyecto}
+    {#each proyectos as proyecto, i}
       <ButtonTicker
+        isCurrentSlide={slidesState[i]}
         on:mouseenter={() => previewProyecto(proyecto)}
         on:mouseleave={closePreview}
         buttonText={proyecto.title.rendered}

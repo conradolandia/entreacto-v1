@@ -76,7 +76,6 @@
             on:mouseleave={closePreview}
             on:click={() => abrirProyecto(proyecto)}
             buttonText={proyecto.title.rendered}
-            estaMontado={true}
           />
         {/if}
       </div>

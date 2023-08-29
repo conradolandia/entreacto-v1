@@ -288,4 +288,18 @@
     @apply bg-white;
     @apply text-black;
   }
+
+  @media screen and (max-width: 767px) and (orientation: portrait) {
+    .cortina {
+      width: 50vh;
+    }
+
+    .ui main {
+      height: 100vw;
+    }
+
+    .abiertoActo {
+      width: 100vh;
+    }
+  }
 </style>

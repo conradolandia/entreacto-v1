@@ -1,15 +1,16 @@
 <script>
   import { onMount } from 'svelte';
-
-  export let estaMontado = false;
+  export let isCurrentSlide = false;
   export let buttonText = '';
 
+  let doubleText = `${buttonText} ${buttonText}`;
   let button, text, buttonWidth, textWidth;
   let isOverflowing = false;
 
   function checkOverflow() {
+    if (!button || !text) return;
     buttonWidth = button.clientWidth;
-    textWidth = text.clientWidth;
+    textWidth = text.clientWidth / 2;
     isOverflowing = buttonWidth < textWidth;
   }
 
@@ -17,10 +18,14 @@
     isOverflowing = false;
   }
 
+  $: if (button && text && isCurrentSlide) {
+    checkOverflow();
+  } else {
+    killOverflow();
+  }
+
   onMount(() => {
-    if (estaMontado) {
-      checkOverflow();
-    }
+    checkOverflow();
   });
 </script>
 
@@ -29,7 +34,6 @@
   class="slide"
   bind:this={button}
   on:mouseenter={checkOverflow}
-  on:mouseleave={killOverflow}
   on:mouseenter
   on:mouseleave
   on:click
@@ -38,7 +42,11 @@
     bind:this={text}
     class={isOverflowing ? 'ticker-text overflowing' : 'ticker-text'}
   >
-    {buttonText}
+    {#if isOverflowing}
+      {doubleText}
+    {:else}
+      {buttonText}
+    {/if}
   </div>
 </button>
 
@@ -66,20 +74,19 @@
   }
 
   .ticker-text.overflowing {
-    animation-duration: 5s;
-    animation-timing-function: ease-out;
+    animation-duration: 8s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
     animation-name: ticker;
   }
 
   @keyframes ticker {
-    0% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(-60%);
-    }
+    0%,
     100% {
       transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
     }
   }
 </style>
