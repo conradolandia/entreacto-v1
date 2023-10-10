@@ -1,16 +1,17 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { abiertoActo, projectPreview } from './store';
+  import { abiertoActo, projectPreview, URL } from './store';
   import { push } from 'svelte-spa-router';
 
   import Eright from './Eright.svelte';
   import Eleft from './Eleft.svelte';
   import Spinner from './Spinner.svelte';
   import ProyectoFooter from './ProyectoFooter.svelte';
+  import Flecha from './Flecha.svelte';
 
   export let params;
 
-  const BASE_URL = 'https://www.entreacto.co/admin/wp-json/wp/v2/posts';
+  const BASE_URL = `${$URL}/wp-json/wp/v2/posts`;
   const ALL_FIELDS = '_fields=title,slug';
   const SINGLE_FIELDS = '_fields=title,slug,content,acf&acf_format=standard';
 
@@ -149,12 +150,7 @@
           <span title={subtitle} class="block">{subtitle}</span>
         </h1>
         <div class="absolute bottom-6">
-          <button
-            on:click={scrollDown}
-            class="text-black animate-bounce text-2xl w-12 h-12"
-          >
-            ↧
-          </button>
+          <Flecha on:click={scrollDown} />
         </div>
         <div class="absolute top-full pointer-events-auto">
           <div class="entrada prose-2xl mb-32 md:text-justify">
@@ -181,7 +177,7 @@
     @apply grid justify-items-center items-center w-full h-full;
   }
   .post-title {
-    @apply z-10 py-16 w-1/2 flex flex-col justify-center items-center text-3xl transform-gpu transition-all scale-150 duration-500;
+    @apply z-50 py-16 w-1/2 flex flex-col justify-center items-center text-3xl transition-all scale-150 duration-500;
     pointer-events: all;
   }
 

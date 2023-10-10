@@ -7,6 +7,7 @@
     visibleEntre,
     visibleActo,
     projectPreview,
+    URL,
   } from './store';
 
   import Nav from './Nav.svelte';
@@ -55,7 +56,7 @@
   const fetchIntro = async () => {
     try {
       const res = await fetch(
-        'https://www.entreacto.co/admin/wp-json/wp/v2/pages?slug=intro&_fields=content'
+        `${$URL}/wp-json/wp/v2/pages?slug=intro&_fields=content`
       );
 
       if (!res.ok) {
@@ -137,7 +138,7 @@
           <ButtonIcon
             fill="#fff"
             name="Message"
-            href="mailto:test@example.com?subject=Mensaje desde entreacto.co"
+            href="mailto:test@example.com?subject=Mensaje desde entreacto"
             target="_blank"
           />
           <ButtonIcon

@@ -1,15 +1,16 @@
 <script>
   import { onMount } from 'svelte';
 
-  import { abiertoActo, projectPreview } from './store';
+  import { abiertoActo, projectPreview, URL } from './store';
 
-  import Eright from './Eright.svelte';
   import Eleft from './Eleft.svelte';
+  import Eright from './Eright.svelte';
   import ButtonTicker from './ButtonTicker.svelte';
+  import Flecha from './Flecha.svelte';
 
   /////////////////////////// manejar el hover
 
-  const hoverDuration = 1000;
+  const hoverDuration = 100;
 
   let hoverTimeout,
     lastHoveredProyecto,
@@ -114,6 +115,11 @@
     }
   };
 
+  const handleClick = (dir = 1) => {
+    const index = dir > 0 ? slide.current + 1 : slide.current - 1;
+    switchSlide(index);
+  };
+
   // cambiar slide
   const switchSlide = index => {
     const { num } = slide;
@@ -193,7 +199,7 @@
   const fetchProyectos = async () => {
     try {
       const res = await fetch(
-        'https://www.entreacto.co/admin/wp-json/wp/v2/posts?_fields=title,slug,id,acf,excerpt&per_page=99&acf_format=standard'
+        `${$URL}/wp-json/wp/v2/posts?_fields=title,slug,id,acf,excerpt&per_page=99&acf_format=standard`
       );
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -218,22 +224,36 @@
   <button>
     <Eright fill="#fff" />
   </button>
-  <div
-    bind:this={sliderRef}
-    on:touchstart={handleTouchStart}
-    on:touchmove={handleTouchMove}
-    on:wheel={handleWheel}
-    on:wheel={closePreview}
-    class="contenidoActo"
-  >
-    {#each proyectos as proyecto, i}
-      <ButtonTicker
-        isCurrentSlide={slidesState[i]}
-        on:mouseenter={() => previewProyecto(proyecto)}
-        on:mouseleave={closePreview}
-        buttonText={proyecto.title.rendered}
+  <div class="contenedorActo">
+    <div class="boton absolute w-full mx-6 text-center top-9">
+      <Flecha
+        color="white"
+        animate={false}
+        invert={true}
+        on:click={() => handleClick(0)}
       />
-    {/each}
+    </div>
+    <div
+      bind:this={sliderRef}
+      on:touchstart={handleTouchStart}
+      on:touchmove={handleTouchMove}
+      on:wheel={handleWheel}
+      on:wheel={closePreview}
+      class="contenidoActo"
+    >
+      {#each proyectos as proyecto, i}
+        <ButtonTicker
+          isCurrentSlide={slidesState[i]}
+          on:mouseenter={() => previewProyecto(proyecto)}
+          on:click={() => previewProyecto(proyecto)}
+          on:mouseleave={closePreview}
+          buttonText={proyecto.title.rendered}
+        />
+      {/each}
+    </div>
+    <div class="boton absolute w-full mx-6 text-center bottom-8">
+      <Flecha color="white" animate={false} on:click={() => handleClick(1)} />
+    </div>
   </div>
   <button>
     <Eleft fill="#fff" />
@@ -241,6 +261,13 @@
 {/if}
 
 <style>
+  .boton {
+    z-index: 51;
+  }
+  .contenedorActo {
+    @apply w-full h-full relative;
+  }
+
   .contenidoActo {
     @apply pointer-events-auto 
     z-50 

@@ -1,5 +1,17 @@
+<script>
+  export let color = '#000000';
+</script>
+
 <svg class="spinner" viewBox="0 0 40 40">
-  <circle class="path" cx="20" cy="20" r="10" fill="none" stroke-width="3" />
+  <circle
+    class="path"
+    cx="20"
+    cy="20"
+    r="10"
+    fill="none"
+    stroke={color}
+    stroke-width="3"
+  />
 </svg>
 
 <style>
@@ -12,7 +24,6 @@
     height: 40px;
   }
   .spinner .path {
-    stroke: #000000;
     stroke-linecap: round;
     -webkit-animation: dash 1.5s ease-in-out infinite;
     animation: dash 1.5s ease-in-out infinite;

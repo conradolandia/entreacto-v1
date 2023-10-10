@@ -62,7 +62,7 @@
     </div>
     <div class="flex items-center">
       <Eright />
-      <div class="flex-grow text-center relative ml-[19px]">
+      <div class="flex-grow text-center w-full h-full relative ml-[58px]">
         {#if externalUrl}
           <a
             class="slide"
@@ -83,7 +83,7 @@
     </div>
   </div>
   <div class="fondo absolute inset-0 overflow-hidden">
-    {#if is_video}
+    <!-- {#if is_video}
       <video autoplay muted loop>
         <source src={proyecto.acf.fondo_preview} />
         Su navegador no soporta la etiqueta "video"
@@ -94,7 +94,7 @@
         src={proyecto.acf.fondo_preview}
         alt={proyecto.title.rendered}
       />
-    {/if}
+    {/if} -->
   </div>
 {/if}
 
