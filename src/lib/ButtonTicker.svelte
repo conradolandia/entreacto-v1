@@ -10,7 +10,7 @@
   function checkOverflow() {
     if (!button || !text) return;
     buttonWidth = button.clientWidth;
-    textWidth = text.clientWidth / 2;
+    textWidth = text.clientWidth;
     isOverflowing = buttonWidth < textWidth;
   }
 
